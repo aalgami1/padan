@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Portfolio</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --text: #222;
+      --primary: #ffd966;
+      --header: #1A2238;
+    }
+    body.dark {
+      --bg: #121212;
+      --text: #f4f4f4;
+      --header: #0d1321;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+
+    /* HEADER NAVBAR */
+    header {
+      background: var(--header);
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .menu-toggle {
+      display: none;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    /* RESPONSIVE NAV */
+    @media(max-width:768px){
+      nav {
+        display: none;
+        flex-direction: column;
+        background: var(--header);
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        padding: 10px;
+      }
+      nav.show { display: flex; }
+      .menu-toggle { display: block; }
+    }
+
+    /* LOGIN WRAPPER */
+    .wrapper {
+      width: 380px;
+      margin: 50px auto;
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      border-radius: 10px;
+      color: #fff;
+    }
+    .input-box { margin: 15px 0; }
+    .input-box input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 6px;
+      background: var(--primary);
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .toggle-link { text-align: center; margin-top: 10px; }
+    .toggle-link a { color: var(--primary); cursor: pointer; }
+
+    /* PORTO SECTION */
+    #porto {
+      display: none;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: #000;
+      padding: 12px 18px;
+      border-radius: 6px;
+      font-weight: bold;
+      display: none;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein { from{opacity:0;bottom:0;} to{opacity:1;bottom:20px;} }
+    @keyframes fadeout { from{opacity:1;bottom:20px;} to{opacity:0;bottom:0;} }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header>
+    <h1>MyPorto</h1>
+    <i class="bx bx-menu menu-toggle" onclick="toggleMenu()"></i>
+    <nav id="navMenu">
+      <a href="#">Home</a>
+      <a href="#">Projects</a>
+      <a href="#">Contact</a>
+      <a onclick="toggleDark()">🌙</a>
+      <a onclick="logout()">Logout</a>
+    </nav>
+  </header>
+
+  <!-- LOGIN -->
+  <div class="wrapper" id="loginForm">
+    <h1>Login</h1>
+    <div class="input-box"><input type="text" id="loginUser" placeholder="Username"></div>
+    <div class="input-box"><input type="password" id="loginPass" placeholder="Password"></div>
+    <button class="btn" onclick="login()">Login</button>
+    <div class="toggle-link">Belum punya akun? <a onclick="showRegister()">Register</a></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="wrapper" id="registerForm" style="display:none;">
+    <h1>Register</h1>
+    <div class="input-box"><input type="text" id="regUser" placeholder="Username"></div>
+    <div class="input-box"><input type="password" id="regPass" placeholder="Password"></div>
+    <button class="btn" onclick="register()">Register</button>
+    <div class="toggle-link">Sudah punya akun? <a onclick="showLogin()">Login</a></div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div id="porto">
+    <h2>Selamat Datang 👋</h2>
+    <p>Ini adalah website portfolio modern dengan fitur login/register.</p>
+    <button class="btn">Lihat Project</button>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+<script>
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+
+  function toggleMenu(){
+    document.getElementById("navMenu").classList.toggle("show");
+  }
+
+  function toggleDark(){
+    document.body.classList.toggle("dark");
+  }
+
+  function showToast(msg){
+    let t = document.getElementById("toast");
+    t.innerText = msg;
+    t.style.display="block";
+    setTimeout(()=>{t.style.display="none";},3000);
+  }
+
+  function showRegister(){
+    document.getElementById("loginForm").style.display="none";
+    document.getElementById("registerForm").style.display="block";
+  }
+  function showLogin(){
+    document.getElementById("registerForm").style.display="none";
+    document.getElementById("loginForm").style.display="block";
+  }
+
+  function register(){
+    let user = document.getElementById("regUser").value;
+    let pass = document.getElementById("regPass").value;
+    if(user && pass){
+      users.push({username:user,password:pass});
+      localStorage.setItem("users", JSON.stringify(users));
+      showToast("Register sukses ✅");
+      showLogin();
+    } else {
+      showToast("Isi semua data ❌");
+    }
+  }
+
+  function login(){
+    let user = document.getElementById("loginUser").value;
+    let pass = document.getElementById("loginPass").value;
+    let found = users.find(u=>u.username===user && u.password===pass);
+    if(found){
+      document.getElementById("loginForm").style.display="none";
+      document.getElementById("porto").style.display="block";
+      showToast("Login berhasil 🎉");
+    } else {
+      showToast("Username / Password salah ❌");
+    }
+  }
+
+  function logout(){
+    document.getElementById("porto").style.display="none";
+    document.getElementById("loginForm").style.display="block";
+    showToast("Logout berhasil 👋");
+  }
+</script>
+</body>
+</html>
